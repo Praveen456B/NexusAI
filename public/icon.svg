@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2005/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="50%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="50%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#d946ef"/>
+    </linearGradient>
+    <linearGradient id="radarGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <rect width="504" height="504" x="4" y="4" rx="124" stroke="url(#neon)" stroke-width="4" stroke-opacity="0.4"/>
+  
+  <!-- Radar Rings -->
+  <circle cx="256" cy="256" r="180" stroke="#334155" stroke-width="2" stroke-dasharray="8 8" opacity="0.6"/>
+  <circle cx="256" cy="256" r="130" stroke="#475569" stroke-width="2" opacity="0.7"/>
+  <circle cx="256" cy="256" r="80" stroke="#6366f1" stroke-width="3" opacity="0.85"/>
+  
+  <!-- Sweeping Radar Cone -->
+  <path d="M256 256 L380 132 A180 180 0 0 0 256 76 Z" fill="url(#radarGlow)" opacity="0.25"/>
+  
+  <!-- Center Brain Core Nodes -->
+  <circle cx="256" cy="256" r="32" fill="url(#neon)"/>
+  <circle cx="256" cy="256" r="16" fill="#f59e0b"/>
+  
+  <!-- Satellite Nodes -->
+  <circle cx="340" cy="180" r="10" fill="#06b6d4"/>
+  <circle cx="180" cy="330" r="12" fill="#d946ef"/>
+  <circle cx="170" cy="190" r="8" fill="#10b981"/>
+  <circle cx="330" cy="320" r="10" fill="#6366f1"/>
+  
+  <!-- Interconnecting Circuit Lines -->
+  <line x1="256" y1="256" x2="340" y2="180" stroke="#06b6d4" stroke-width="2" stroke-opacity="0.8"/>
+  <line x1="256" y1="256" x2="180" y2="330" stroke="#d946ef" stroke-width="2" stroke-opacity="0.8"/>
+  <line x1="256" y1="256" x2="170" y2="190" stroke="#10b981" stroke-width="2" stroke-opacity="0.8"/>
+  <line x1="256" y1="256" x2="330" y2="320" stroke="#6366f1" stroke-width="2" stroke-opacity="0.8"/>
+</svg>

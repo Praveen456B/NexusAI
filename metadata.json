@@ -1,0 +1,6 @@
+{
+  "name": "NexusAI - The AI World Radar & Professional Upskilling Hub",
+  "description": "Live AI intelligence radar, new tools & tech tracker, executive briefings, structured learning paths, and progress tracking for working professionals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

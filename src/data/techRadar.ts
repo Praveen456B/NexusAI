@@ -1,0 +1,191 @@
+import { TechTool } from '../types';
+
+export const TECH_RADAR_TOOLS: TechTool[] = [
+  {
+    id: 'tool-mcp',
+    name: 'Model Context Protocol (MCP)',
+    category: 'Agents & Protocol',
+    stage: 'Adopt',
+    description: 'Open standard protocol created by Anthropic that standardizes how applications provide context and tools to LLMs.',
+    whyItMatters: 'Decouples tools from specific LLM providers. One MCP server for Postgres or GitHub works across Claude, Cursor, and custom agent systems.',
+    githubOrSite: 'https://modelcontextprotocol.io',
+    maturity: 'Production Ready',
+    license: 'MIT',
+    replacesOrComplements: 'Replaces custom ad-hoc function calling glue code with an open JSON-RPC protocol.',
+    quickCodeSnippet: `// Connect to an MCP server over stdio
+import { Client } from "@modelcontextprotocol/sdk/client/index.js";
+import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+
+const transport = new StdioClientTransport({ command: "npx", args: ["-y", "@modelcontextprotocol/server-postgres"] });
+const client = new Client({ name: "my-app", version: "1.0.0" }, { capabilities: {} });
+await client.connect(transport);
+const tools = await client.listTools();`,
+    pros: ['Open standard with broad ecosystem support', 'Secure process isolation via stdio', 'Dynamic tool discovery'],
+    cons: ['Still evolving for multi-tenant web SSE setups', 'Early documentation for complex auth flows'],
+  },
+  {
+    id: 'tool-vllm',
+    name: 'vLLM (PagedAttention Serving)',
+    category: 'Inference & Serving',
+    stage: 'Adopt',
+    description: 'High-throughput and memory-efficient LLM serving engine featuring PagedAttention and continuous batching.',
+    whyItMatters: 'Achieves 2-4x higher serving throughput than standard HuggingFace TGI with fractional memory waste. Industry gold standard for self-hosting.',
+    githubOrSite: 'https://github.com/vllm-project/vllm',
+    maturity: 'Production Ready',
+    license: 'Apache 2.0',
+    replacesOrComplements: 'Replaces HuggingFace TGI and raw PyTorch serving with automatic prefix caching and quantization.',
+    quickCodeSnippet: `vllm serve Qwen/Qwen2.5-Coder-14B-Instruct --port 8000 --enable-prefix-caching --quantization fp8`,
+    pros: ['Industry standard throughput', 'Native FP8 / AWQ / GPTQ support', 'Drop-in OpenAI API compatibility'],
+    cons: ['Requires NVIDIA/ROCm GPU hardware', 'High memory overhead during cold boot'],
+  },
+  {
+    id: 'tool-langgraph',
+    name: 'LangGraph',
+    category: 'Agents & Protocol',
+    stage: 'Adopt',
+    description: 'Library for building resilient multi-actor agent applications with cyclical state machines and human-in-the-loop controls.',
+    whyItMatters: 'Replaces unpredictable autonomous agent loops with deterministic, checkpointed, inspectable state graphs.',
+    githubOrSite: 'https://github.com/langchain-ai/langgraph',
+    maturity: 'Production Ready',
+    license: 'MIT',
+    replacesOrComplements: 'Complements LangChain; replaces naive ReAct loops and AutoGPT-style infinite iterations.',
+    quickCodeSnippet: `const graph = new StateGraph({ channels: { messages: { value: addMessages, default: () => [] } } })
+  .addNode("agent", callModel)
+  .addNode("tools", toolNode)
+  .addEdge(START, "agent")
+  .addConditionalEdges("agent", shouldContinue);`,
+    pros: ['Deterministic execution graphs', 'First-class time-travel debugging and pause/resume', 'Strong TypeScript and Python SDKs'],
+    cons: ['Slightly steep learning curve for channel reducers', 'Heavier than minimalistic scripts'],
+  },
+  {
+    id: 'tool-deepseek-r1',
+    name: 'DeepSeek-R1 & Distillations',
+    category: 'Inference & Serving',
+    stage: 'Adopt',
+    description: 'Frontier-class open reasoning models trained via Large-Scale Reinforcement Learning without supervised cold-start.',
+    whyItMatters: 'Proved that reasoning behaviors (backtracking, verification, self-reflection) can emerge purely from RL and be distilled into 1.5B - 70B models.',
+    githubOrSite: 'https://github.com/deepseek-ai/DeepSeek-R1',
+    maturity: 'Production Ready',
+    license: 'MIT',
+    replacesOrComplements: 'Enables private, cost-effective reasoning replacing high-cost proprietary reasoning endpoints.',
+    quickCodeSnippet: `// Run local distilled reasoning via Ollama
+ollama run deepseek-r1:14b`,
+    pros: ['Open weights with MIT license', 'Unmatched math and coding reasoning', 'Runs locally on consumer Apple Silicon or A10 GPUs'],
+    cons: ['Verbose output reasoning chains require token parsing', 'Higher output token counts impact latency'],
+  },
+  {
+    id: 'tool-lancedb',
+    name: 'LanceDB',
+    category: 'RAG & Storage',
+    stage: 'Adopt',
+    description: 'Serverless vector database for AI based on the Lance columnar data format, enabling multi-modal search and disk-based vector indexing.',
+    whyItMatters: 'Does not require in-memory indexing like HNSW. You can query 100M vectors directly from NVMe SSD or S3 at 1/10th the cost of cloud vector services.',
+    githubOrSite: 'https://github.com/lancedb/lancedb',
+    maturity: 'Production Ready',
+    license: 'Apache 2.0',
+    replacesOrComplements: 'Replaces high-cost RAM-heavy vector databases like Pinecone for cost-conscious architectures.',
+    quickCodeSnippet: `import * as lancedb from "@lancedb/lancedb";
+const db = await lancedb.connect("data/sample-lancedb");
+const table = await db.createTable("documents", data);
+const results = await table.search([0.1, 0.2, ...]).limit(5).toArray();`,
+    pros: ['Zero-copy columnar format', 'Runs embedded or cloud-native', 'Native hybrid and full-text search'],
+    cons: ['Ecosystem tools still catching up to Pinecone/Qdrant', 'Writing very small frequent records has compaction overhead'],
+  },
+  {
+    id: 'tool-unsloth',
+    name: 'Unsloth',
+    category: 'Fine-Tuning & Training',
+    stage: 'Trial',
+    description: 'Ultra-fast, memory-optimized fine-tuning library for LLMs (Llama, Mistral, Qwen, DeepSeek).',
+    whyItMatters: 'Provides 2-5x faster training speeds with 70% less VRAM usage through custom handwritten Triton kernels.',
+    githubOrSite: 'https://github.com/unslothai/unsloth',
+    maturity: 'Rapidly Evolving',
+    license: 'Apache 2.0',
+    replacesOrComplements: 'Replaces vanilla HuggingFace TRL and PEFT for LoRA/QLoRA training.',
+    quickCodeSnippet: `from unsloth import FastLanguageModel
+model, tokenizer = FastLanguageModel.from_pretrained(
+    model_name = "unsloth/Qwen2.5-Coder-7B",
+    max_seq_length = 4096,
+    load_in_4bit = True,
+)`,
+    pros: ['Drastic VRAM savings', 'Zero accuracy loss compared to standard backprop', 'Export directly to GGUF and Ollama'],
+    cons: ['Currently Python and Linux/CUDA focused', 'Multi-GPU scaling still stabilizing'],
+  },
+  {
+    id: 'tool-ragas',
+    name: 'Ragas (RAG Assessment)',
+    category: 'Evals & Guardrails',
+    stage: 'Adopt',
+    description: 'Framework for evaluating Retrieval-Augmented Generation (RAG) pipelines without requiring human ground-truth labels.',
+    whyItMatters: 'Quantifies Faithfulness (hallucination detection), Answer Relevance, and Context Recall in automated CI/CD pipelines.',
+    githubOrSite: 'https://github.com/explodinggradients/ragas',
+    maturity: 'Production Ready',
+    license: 'Apache 2.0',
+    replacesOrComplements: 'Replaces subjective manual vibe-checks with automated regression metrics.',
+    quickCodeSnippet: `from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy
+
+result = evaluate(
+    dataset,
+    metrics=[faithfulness, answer_relevancy]
+)`,
+    pros: ['Actionable metric breakdown', 'Synthetic test data generation', 'CI/CD integration friendly'],
+    cons: ['Consumes LLM tokens during evaluation', 'Requires calibrating judge prompts for specialized domains'],
+  },
+  {
+    id: 'tool-cursor',
+    name: 'Cursor & Windsurf (AI Native IDEs)',
+    category: 'Dev Productivity',
+    stage: 'Adopt',
+    description: 'Next-generation code editors built from the ground up around full-codebase indexing, multi-file edits, and agentic Composer.',
+    whyItMatters: 'Shifts engineering from single-line autocomplete to system-level feature generation, automated refactors, and semantic codebase indexing.',
+    githubOrSite: 'https://cursor.com',
+    maturity: 'Production Ready',
+    license: 'Proprietary',
+    replacesOrComplements: 'Replaces standard VS Code extensions with deeply integrated codebase reasoning.',
+    pros: ['Multi-file edits in a single prompt', 'Instant codebase indexing via Merkle trees', 'Model switcher (Claude 3.7, o3-mini, Gemini 2.5)'],
+    cons: ['Closed source core', 'Requires team governance for enterprise IP compliance'],
+  },
+  {
+    id: 'tool-dspy',
+    name: 'DSPy (Stanford Declarative Self-Improving Prompts)',
+    category: 'Agents & Protocol',
+    stage: 'Trial',
+    description: 'Framework for algorithmically optimizing LLM prompts and weights instead of manual prompt hacking.',
+    whyItMatters: 'Treats prompts like parameters in a neural net. You define Signatures and Metrics, and DSPy compiles optimal few-shot demonstrations automatically.',
+    githubOrSite: 'https://github.com/stanfordnlp/dspy',
+    maturity: 'Rapidly Evolving',
+    license: 'MIT',
+    replacesOrComplements: 'Replaces brittle manual prompt crafting with programmatic optimization.',
+    pros: ['Systematic performance gains', 'Resilient across model upgrades', 'Academic rigor from Stanford NLP'],
+    cons: ['Paradigm shift takes time to grasp', 'Requires well-defined scoring functions'],
+  },
+  {
+    id: 'tool-graphrag',
+    name: 'Microsoft GraphRAG',
+    category: 'RAG & Storage',
+    stage: 'Assess',
+    description: 'Knowledge graph-augmented retrieval system that extracts entity-relationship graphs from documents to answer holistic cross-dataset questions.',
+    whyItMatters: 'Solves questions that vector search cannot answer (e.g. "What are the major themes across all 200 documents?").',
+    githubOrSite: 'https://github.com/microsoft/graphrag',
+    maturity: 'Rapidly Evolving',
+    license: 'MIT',
+    replacesOrComplements: 'Complements vector RAG for high-level thematic queries and entity relationship traversals.',
+    pros: ['Holistic dataset understanding', 'Hierarchical Leiden community clustering', 'Reduces multi-hop hallucinations'],
+    cons: ['Very expensive indexing phase (requires thousands of LLM calls)', 'High operational complexity'],
+  },
+  {
+    id: 'tool-naive-vector',
+    name: 'Naive Chunk-Only Vector Search (No Rerank / No Hybrid)',
+    category: 'RAG & Storage',
+    stage: 'Hold',
+    description: 'Basic cosine similarity on 500-token chunks without lexical search or cross-encoder rerankers.',
+    whyItMatters: 'Demonstrably inadequate for commercial production. Fails on exact keywords, numbers, dates, and causes up to 60% hallucination rates.',
+    githubOrSite: '',
+    maturity: 'Production Ready',
+    license: 'N/A',
+    replacesOrComplements: 'Replace with Hybrid Search (BM25 + Dense) + Cross-Encoder Reranking.',
+    pros: ['Simple 10-line tutorial setup'],
+    cons: ['High hallucination rate', 'Blind to exact matches and acronyms', 'Context boundary fragmentation'],
+  },
+];
